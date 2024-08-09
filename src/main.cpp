@@ -9,50 +9,29 @@
 
 int main() {
 
-    Mesh mesh;
+    
     float edgeLength = 2.0;
+    Mesh triangle("Triangle01");
+    Mesh square("Square01");
+    Mesh cube("Cube01");
+    Mesh pyramid("Pyramid01");
+    
+
+    triangle.buildTriangle();
+    square.buildSimpleSquare();
+    cube.buildCube(4.0f);
+    pyramid.buildPyramid(2.0f, 2.0f);
+
+
+    triangle.printMeshData();
+    square.printMeshData();
+    cube.printMeshData();
+    pyramid.printMeshData();
    
-    mesh.buildCube(2.0f);
-
-    std::cout << "vertices: " << mesh.getVertCount() << std::endl;
-    std::cout << "faces: " << mesh.getFaceCount() << std::endl;
-    std::cout << "halfEdges: " << mesh.halfEdges.size() << std::endl;
-    //mesh.printVertCoords();
-    //mesh.printHalfEdgeData();
-
-    //std::cout << "Face index: " << mesh.halfEdges[1].face->idx << std::endl;
-
-    mesh.bindHalfEdgePairs();
-
-    for (int i = 0; i < mesh.halfEdges.size(); i++) {
-        if (mesh.halfEdges[1].next) {
-            std::cout << "has next" << std::endl;
-
-        }
-        else {
-            std::cout << "no next" << std::endl;
-        }
-    }
-    for (int i = 0; i < mesh.halfEdges.size(); i++) {
-        if (mesh.halfEdges[i].twin) {
-            std::cout << "has twin" << std::endl;
-
-        }
-        else {
-            std::cout << "no twin" << std::endl;
-        }
-    }
-
-    for (int i = 0; i < mesh.halfEdges.size(); i++) {
-        if (mesh.halfEdges[i].isBorder) {
-            std::cout << "border edge" << std::endl;
-
-        }
-        else {
-            std::cout << "internal edge" << std::endl;
-        }
-    }
-
+    triangle.exportToOBJ("obj/triangle.obj");
+    square.exportToOBJ("obj/square.obj");
+    cube.exportToOBJ("obj/cube.obj");
+    pyramid.exportToOBJ("obj/pyramid.obj");
 
 
     return 0;

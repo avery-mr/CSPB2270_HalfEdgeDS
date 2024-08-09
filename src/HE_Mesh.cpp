@@ -13,6 +13,7 @@ Vert::Vert(float x, float y, float z, int idx) {
 
 Edge::Edge() {
 	this->hEdge = nullptr;
+	isBorder = true;
 }
 
 Face::Face() {
@@ -26,12 +27,12 @@ HalfEdge::HalfEdge() {
 	this->next = nullptr;
 	this->face = nullptr;
 	this->edge = nullptr;
-	this->isBorder = false;
 }
 
-Mesh::Mesh() {
+Mesh::Mesh(const std::string& name) {
 	// for debugging: reserving space in each vector to avoid having to reallocate space and potentially screw up pointers
 	// using arbitrary small values that can hold data for simple primitives only
+	this->name = name;
 	vertices.reserve(20);
 	halfEdges.reserve(100);
 	edges.reserve(50);
@@ -48,7 +49,7 @@ void Mesh::clearMeshData() {
 void Mesh::createVert(float x, float y, float z, int idx) {
 	Vert newVert(x, y, z, idx);
 	vertices.push_back(newVert);
-	std::cout << "Created Vertex: " << idx << " at " << &vertices.back() << std::endl;
+	//std::cout << "Created Vertex: " << idx << " at " << &vertices.back() << std::endl;
 
 	return;
 }
@@ -110,15 +111,15 @@ void Mesh::createFace(int vert1, int vert2, int vert3, int idx) {
 }
 
 void Mesh::bindHalfEdgePairs() {
-	std::cout << "running bind pairs...." << std::endl;
+	//std::cout << "running bind pairs...." << std::endl;
 	for (auto& he1 : halfEdges) { // loop through all halfEdges
 		bool foundTwin = false; 
 		if (he1.twin == nullptr) {  // if twin already set, no need to look again
-			std::cout << " --- Checking vert " << he1.vert->idx << " ---> " << he1.next->vert->idx << std::endl;
+			//std::cout << " --- Checking vert " << he1.vert->idx << " ---> " << he1.next->vert->idx << std::endl;
 			for (auto& he2 : halfEdges) {  // loop through all halfEdges a second time to find matching opposite
-				std::cout << " --------- " << he2.vert->idx << " ---> " << he2.next->vert->idx << std::endl;
+				//std::cout << " --------- " << he2.vert->idx << " ---> " << he2.next->vert->idx << std::endl;
 				if (he1.vert == he2.next->vert && he2.vert == he1.next->vert) {
-					std::cout << "found twins!" << std::endl;
+					//std::cout << "congratulations, its twins!" << std::endl;
 					he1.twin = &he2;  // set he1 twin to he2 and vice versa
 					he2.twin = &he1;
 					foundTwin = true;  // ran into segment fault here, forgot to end the loop
@@ -129,8 +130,8 @@ void Mesh::bindHalfEdgePairs() {
 		else {
 			foundTwin = true;  // if halfEdge twin already set, make sure fount twin flag is true so isBorder doesn't get set
 		}
-		if (!foundTwin) {
-			he1.isBorder = true;
+		if (foundTwin) {
+			he1.edge->isBorder = false;
 			
 		}
 	}
@@ -168,6 +169,33 @@ void Mesh::printHalfEdgeData() {
 	else {
 		std::cout << "No half edges to print....." << std::endl;
 	}
+}
+
+void Mesh::printMeshData() {
+	std::cout << "\nName: " << name << std::endl;
+	//std::cout << "\n ------- MAIN DATA -------" << std::endl;
+	std::cout << "Vertex Count: " << vertices.size() << std::endl;
+	std::cout << "Edge Count: " << edges.size() << std::endl;
+	std::cout << "Half Edge Count: " << halfEdges.size() << std::endl;
+	std::cout << "Face Count: " << faces.size() << std::endl;
+	//std::cout << "\n------- ADDITIONAL DATA -------" << std::endl;
+	int unpairedHE = 0;
+	for (auto& he : halfEdges) {
+		if (!he.twin) {
+			unpairedHE++;
+		}
+	}
+	std::cout << "Unpaired Half Edges: " << unpairedHE << std::endl;
+	int borderCount = 0;
+	for (auto& edge : edges) {
+		if (edge.isBorder == true) {
+			borderCount++;
+		}
+	}
+	std::cout << "Open (Border) Edge Count: " << borderCount << std::endl;
+	if (borderCount == 0) { std::cout << "Mesh is watertight" << std::endl; }
+	else { std::cout << "Mesh is not watertight" << std::endl; }
+
 }
 
 
@@ -216,6 +244,8 @@ void Mesh::buildTriangle() {
 	createVert(2.0, -1.0, 0.0, 2);
 
 	createFace(0, 1, 2, 0);
+
+	bindHalfEdgePairs();
 }
 
 void Mesh::buildSimpleSquare() {
@@ -226,6 +256,8 @@ void Mesh::buildSimpleSquare() {
 
 	createFace(0, 1, 3, 0); 
 	createFace(1, 2, 3, 1); 
+
+	bindHalfEdgePairs();
 }
 void Mesh::buildPlane(float edgeLength) {
 	float halfL = edgeLength / 2.0;
@@ -237,6 +269,8 @@ void Mesh::buildPlane(float edgeLength) {
 
 	createFace(0, 1, 2, 0); // Correct order
 	createFace(0, 2, 3, 1); // Correct order
+
+	bindHalfEdgePairs();
 }
 void Mesh::buildCube(float edgeLength) {
 	float halfL = edgeLength / 2.0f;
@@ -269,7 +303,8 @@ void Mesh::buildCube(float edgeLength) {
 	createFace(0, 1, 4, 10);
 	createFace(4, 1, 5, 11);
 
-	
+	//bind half edges to their twins
+	bindHalfEdgePairs();
 
 	return;
 }
@@ -287,13 +322,44 @@ void Mesh::buildPyramid(float baseEdgeLength, float height) {
 	createFace(0, 2, 3, 1);
 
 	// Side faces
-	createFace(0, 1, 4, 2); // Side face 1
-	createFace(1, 2, 4, 3); // Side face 2
-	createFace(2, 3, 4, 4); // Side face 3
-	createFace(3, 0, 4, 5); // Side face 4
+	createFace(1, 0, 4, 2); 
+	createFace(1, 4, 2, 3); 
+	createFace(2, 4, 3, 4); 
+	createFace(0, 3, 4, 5); 
+
+	//bind half edges to their twins
+	bindHalfEdgePairs();
 }
 
+
+// DID SOME COPYING AND PASTING FOR THIS PART FROM VARIOUS SOURCES
 void Mesh::exportToOBJ(const std::string& filename) {
+	std::ofstream file(filename);
+	
+	for (const auto& vert : vertices) {
+		file << "v " << vert.x << " " << vert.y << " " << vert.z << "\n";
+	}
+
+	for (const auto& face : faces) {
+		HalfEdge* startEdge = face.edge;
+		HalfEdge* currentEdge = startEdge;
+		std::vector<int> vIdx;
+
+		do {
+			// add 1 cuz obj indeces are 1 based
+			vIdx.push_back(currentEdge->vert->idx + 1);
+			currentEdge = currentEdge->next;
+		} while (currentEdge != startEdge);
+
+		// same thing, 
+		file << "f";
+		for (int idx : vIdx) {
+			file << " " << idx;
+		}
+		file << "\n";
+	}
+
+	file.close();
 	return;
 }
 

@@ -4,6 +4,9 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <string>
+
+
 
 class Vert;
 class Edge;
@@ -21,6 +24,7 @@ public:
 class Edge {
 public:
 	HalfEdge* hEdge;
+	bool isBorder;
 
 	Edge();
 };
@@ -40,19 +44,19 @@ public:
 	HalfEdge* next; // pointer to the next half-edge around the face
 	Face* face; //pointer to associated face
 	Edge* edge; //pointer to associated undirected edge
-	bool isBorder; //Dont know if this is necessary or even helpful
 
 	HalfEdge();
 };
 
 class Mesh {
 public:
+	std::string name;
 	std::vector<Vert> vertices;
 	std::vector<HalfEdge> halfEdges;
 	std::vector<Edge> edges;
 	std::vector<Face> faces;
-
-	Mesh();
+	
+	Mesh(const std::string& name);
 
 	// CLEAR ALL ABOVE VECTORS
 	void clearMeshData();
@@ -66,8 +70,7 @@ public:
 	//INITIALIZE TRIANGLE FACE WITH 3 VERTICES AND ASSIGN INDEX
 	void createFace(int vert1, int vert2, int vert3, int idx);
 
-	// SUPPOSED TO FIND HALF EDGE TWINS WHERE HE1 STARTS AT A AND POINTS TO B, AND HE2 STARTS AT B AND POINTS TO A
-	// *** NOT WORKING
+	//Find all twin half edges and point them to eachother.  Implement after building mesh.
 	void bindHalfEdgePairs();
 
 	int getVertCount() const;
@@ -77,6 +80,7 @@ public:
 	// DEBUG METHODS ------------------
 	void printVertCoords();
 	void printHalfEdgeData();
+	void printMeshData();
 	// ---------------------------------
 
 	

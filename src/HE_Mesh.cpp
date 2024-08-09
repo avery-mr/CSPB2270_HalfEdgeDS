@@ -65,8 +65,6 @@ void Mesh::createFace(int vert1, int vert2, int vert3, int idx) {
 	faces.push_back(Face());
 	Face* face = &faces.back();
 
-	halfEdges.reserve(halfEdges.size() + 3); // something happening here if I don't reserve enough space, pointers disappearing?
-
 	//std::cout << "Vertex 1: " << &vertices[vert1] << std::endl;
 	//std::cout << "Vertex 2: " << &vertices[vert2] << std::endl;
 	//std::cout << "Vertex 3: " << &vertices[vert3] << std::endl;
@@ -112,15 +110,15 @@ void Mesh::createFace(int vert1, int vert2, int vert3, int idx) {
 }
 
 void Mesh::bindHalfEdgePairs() {
-	//std::cout << "running bind pairs...." << std::endl;
+	std::cout << "running bind pairs...." << std::endl;
 	for (auto& he1 : halfEdges) { // loop through all halfEdges
 		bool foundTwin = false; 
 		if (he1.twin == nullptr) {  // if twin already set, no need to look again
-			//std::cout << " --- Checking vert " << he1.vert->idx << " ---> " << he1.next->vert->idx << std::endl;
+			std::cout << " --- Checking vert " << he1.vert->idx << " ---> " << he1.next->vert->idx << std::endl;
 			for (auto& he2 : halfEdges) {  // loop through all halfEdges a second time to find matching opposite
-				//std::cout << " --------- " << he2.vert->idx << " ---> " << he2.next->vert->idx << std::endl;
+				std::cout << " --------- " << he2.vert->idx << " ---> " << he2.next->vert->idx << std::endl;
 				if (he1.vert == he2.next->vert && he2.vert == he1.next->vert) {
-					//std::cout << "found twins!" << std::endl;
+					std::cout << "found twins!" << std::endl;
 					he1.twin = &he2;  // set he1 twin to he2 and vice versa
 					he2.twin = &he1;
 					foundTwin = true;  // ran into segment fault here, forgot to end the loop
@@ -241,7 +239,7 @@ void Mesh::buildPlane(float edgeLength) {
 	createFace(0, 2, 3, 1); // Correct order
 }
 void Mesh::buildCube(float edgeLength) {
-	float halfL = edgeLength / 2.0;
+	float halfL = edgeLength / 2.0f;
 
 	createVert(-halfL, -halfL, -halfL, 0);
 	createVert(halfL, -halfL, -halfL, 1);
@@ -252,31 +250,26 @@ void Mesh::buildCube(float edgeLength) {
 	createVert(-halfL, halfL, halfL, 6);
 	createVert(halfL, halfL, halfL, 7);
 
+	// face (-z)
+	createFace(0, 2, 1, 0);
+	createFace(1, 2, 3, 1);
+	// face (+x)
+	createFace(1, 3, 5, 2);
+	createFace(5, 3, 7, 3);
+	// face (+z)
+	createFace(5, 7, 4, 4);
+	createFace(4, 7, 6, 5);
+	// face (-x)
+	createFace(4, 6, 0, 6);
+	createFace(0, 6, 2, 7);
+	// face (+y)
+	createFace(2, 6, 3, 8);
+	createFace(3, 6, 7, 9);
+	// face (-y)
+	createFace(0, 1, 4, 10);
+	createFace(4, 1, 5, 11);
 
-
-
-
-
-
-	//create faces from vertex index, in clockwise rotation
-	//bottom face (z-)
-	createFace(0, 1, 3, 0);
-	createFace(0, 3, 4, 1);
-	//top face (z+)
-	createFace(4, 7, 5, 2);
-	createFace(4, 6, 7, 3);
-	//front face (y-)
-	createFace(0, 5, 1, 4);
-	createFace(0, 4, 5, 5);
-	// right face (x+)
-	createFace(1, 7, 3, 6);
-	createFace(1, 5, 7, 7);
-	// back face (y+)
-	createFace(3, 6, 2, 8);
-	createFace(3, 7, 6, 9);
-	// left face (x-)
-	createFace(0, 2, 4, 10);
-	createFace(2, 6, 4, 11);
+	
 
 	return;
 }

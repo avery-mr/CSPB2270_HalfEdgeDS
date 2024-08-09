@@ -11,14 +11,14 @@ int main() {
 
     Mesh mesh;
     float edgeLength = 2.0;
-    mesh.clearMeshData();
-    mesh.buildSimpleSquare();
+   
+    mesh.buildCube(2.0f);
 
     std::cout << "vertices: " << mesh.getVertCount() << std::endl;
     std::cout << "faces: " << mesh.getFaceCount() << std::endl;
     std::cout << "halfEdges: " << mesh.halfEdges.size() << std::endl;
-    mesh.printVertCoords();
-    mesh.printHalfEdgeData();
+    //mesh.printVertCoords();
+    //mesh.printHalfEdgeData();
 
     //std::cout << "Face index: " << mesh.halfEdges[1].face->idx << std::endl;
 

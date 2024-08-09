@@ -1,4 +1,4 @@
-#include "HE_Mesh.h"
+#include "../include/HE_Mesh.h"
 #include <vector>
 #include <iostream>
 

@@ -15,7 +15,7 @@ I initially aimed to:
 - Use OpenGL and GLFW to set up a basic rendering pipeline.
 
 ### Challenges and Revisions
-- **Rendering Complexity:** Setting up modern OpenGL was more difficult than anticipated. I wasn't able to learn and implement the necessary shaders and pipeline within the available time. Therefore, the project was adjusted to focus solely on the data structure, with a goal of building and manipulating simple primitive shapes.
+- **Rendering Complexity:** Setting up modern OpenGL was more difficult than anticipated.  I had trouble finding enough documentation on older OpenGL or other graphics libraries and I eventually decided to dismiss the idea of rendering since I wasn't able to learn and implement the necessary shaders and pipeline within the available time. The project was adjusted to focus solely on the data structure, with a goal of building and manipulating simple primitive shapes.
 - **Data Output:** In lieu of implementing my own rendering pipeline I opted to write the mesh data to .obj format to load and view in an external application. 
 - **Data Structure Design:** I began with the idea of using classes for each element (vertices, edges, faces, half-edges) to encapsulate behavior. However, as the project progressed, I found it more straightforward to incorporate all necessary methods into a single `Mesh` class. If I were to start over, I would likely use structs for simplicity.
 - **Functionality:** Most of the methods I wrote for my mesh class were intended to navigate and traverse the mesh, to debug any issues in the building process, and to ensure the mesh was ultimately built correctly and clean.  This required stitching together half edge pairs and ensuring the number of vertices, faces and open edges were appropriate.
@@ -41,9 +41,8 @@ For simplicity's sake, this version of the half-edge data structure requires a f
 
 ## Issues and Challenges
 
-### OpenGL Setup
-- **Modern OpenGL:** Modern OpenGL is challenging to learn quickly due to the complexity of shaders and the rendering pipeline.
-- **Legacy OpenGL:** While older versions of OpenGL and other graphics libraries are, they are less documented and are still very hard to learn in a week.
+### Mesh Data
+- **Vertex Order** Supplying the coordinates of the vertices was rather straightforward, although I often had to draw out diagrams on paper or else use 3d software get a clear picture of what I was creating.  I am used to working with quadrilaterals so having to create even a simple cube with triangles became hard to visualize.  The real struggle was creating the faces with the vertices in the correct order to ensure the half-edge directions were consistent for every face and edge.  This took several attempts, diagrams and debugging to get right.
 
 ### Vector Storage
 - **Pointer Invalidation:** Storing half-edge data in vectors caused issues when vectors resized, invalidating pointers. Reserving enough space in vectors mitigated this problem temporarily but is not a scalable solution. Alternative data structures like `std::list` or smart pointers may provide more robust solutions for dynamic mesh handling.

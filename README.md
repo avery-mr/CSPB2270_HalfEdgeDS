@@ -45,7 +45,7 @@ For simplicity's sake, this version of the half-edge data structure requires a f
 - **Vertex Order** Supplying the coordinates of the vertices was rather straightforward, although I often had to draw out diagrams on paper or else use 3d software get a clear picture of what I was creating.  I am used to working with quadrilaterals so having to create even a simple cube with triangles became hard to visualize.  The real struggle was creating the faces with the vertices in the correct order to ensure the half-edge directions were consistent for every face and edge.  This took several attempts, diagrams and debugging to get right.
 
 ### Vector Storage
-- **Pointer Invalidation:** Storing half-edge data in vectors caused issues when vectors resized, invalidating pointers. Reserving enough space in vectors mitigated this problem temporarily but is not a scalable solution. Alternative data structures like `std::list` or smart pointers may provide more robust solutions for dynamic mesh handling.
+- **Pointer Invalidation:** Storing half-edge data in vectors caused issues when vectors resized, invalidating pointers. Reserving enough space in vectors mitigated this problem temporarily but is not a scalable solution. Alternative data structures like `list` or smart pointers may provide more robust solutions for dynamic mesh handling.
 
 ## Future Considerations
 - **Improved Data Structures:** Future iterations of this project could explore more sophisticated data structures or libraries like `deque` for better memory management and pointer stability.
